@@ -41,12 +41,10 @@ const signin = async (req, res) => {
       .json({ user: rest, message: "Login successful", severity: "success" });
   } catch (error) {
     console.log(error.message);
-    res
-      .status(500)
-      .json({
-        message: error.message || "Internal Server Error",
-        severity: "error",
-      });
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+      severity: "error",
+    });
   }
 };
 
@@ -95,12 +93,10 @@ const signup = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({
-        message: error.message || "Internal Server Error",
-        severity: "error",
-      });
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+      severity: "error",
+    });
   }
 };
 
@@ -110,8 +106,22 @@ const logout = async (req, res) => {
   res.json({ message: "Logged out successfully", severity: "success" });
 };
 
+const authCheck = async (req, res) => {
+  const token = req.cookies.token;
+
+  if (!token) return res.sendStatus(401);
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    res.sendStatus(200);
+  } catch (err) {
+    res.sendStatus(401);
+  }
+};
+
 export default {
   signin,
   signup,
   logout,
+  authCheck,
 };

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../../Context/AppContext";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -10,6 +11,7 @@ const Login = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const { showSnackbar } = useApp();
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -38,9 +40,10 @@ const Login = () => {
       });
 
       const data = await res.json();
-      alert(data.message);
+      showSnackbar(data.message, data.severity);
       if (res.ok && !isSignUp) navigate("/lecturer-videos");
     } catch (error) {
+        showSnackbar("Something went wrong!!", "error");
     } finally {
       setLoading(false);
     }

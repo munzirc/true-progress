@@ -68,7 +68,7 @@ const signup = async (req, res) => {
     if (userExists)
       return res
         .status(400)
-        .json({ message: "User already exists", severity: "info" });
+        .json({ message: "User already exists!!", severity: "error" });
 
     const user = await User.create({
       name,

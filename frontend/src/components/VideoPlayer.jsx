@@ -8,8 +8,8 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   const [video, setVideo] = useState({});
   const videoRef = useRef(null);
   const startTimeRef = useRef(0);
-  const lastTrackedTime = useRef(0);
-  const isSeeking = useRef(false);
+  const lastTrackedTimeRef = useRef(0);
+  const isSeekingRef = useRef(false);
 
 
   // Fetch video
@@ -106,31 +106,31 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   };
 
   const handleSeeking = () => {
-    
+     isSeekingRef.current = true;
   };
 
   const handleSeeked = () => {
     console.log("seeked triggerd");
     const seekedTo = videoRef.current?.currentTime ?? 0;
     if (
-      lastTrackedTime.current > startTimeRef.current &&
-      lastTrackedTime.current - startTimeRef.current > 2
+      lastTrackedTimeRef.current > startTimeRef.current &&
+      lastTrackedTimeRef.current - startTimeRef.current > 2
     ) {
       handleProgressUpdate(
         startTimeRef.current,
-        lastTrackedTime.current,
+        lastTrackedTimeRef.current,
         seekedTo,
         "seeked"
       );
     }
     startTimeRef.current = seekedTo;
-    isSeeking.current = false;
+    isSeekingRef.current = false;
   };
 
   const handleTimeUpdate = (e) => {
     const current = e.target.currentTime;
-    if (!isSeeking.current) {
-      lastTrackedTime.current = current;
+    if (!isSeekingRef.current) {
+      lastTrackedTimeRef.current = current;
     }
   };
 

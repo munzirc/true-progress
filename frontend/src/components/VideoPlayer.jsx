@@ -11,7 +11,6 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   const lastTrackedTimeRef = useRef(0);
   const isSeekingRef = useRef(false);
 
-
   // Fetch video
   useEffect(() => {
     const fetchVideo = async () => {
@@ -23,7 +22,6 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     fetchVideo();
   }, [videoId]);
 
-  // Resume video from last progress
   useEffect(() => {
     if (video?.progress?.lastPosition && videoRef.current) {
       videoRef.current.currentTime = video.progress.lastPosition;
@@ -33,6 +31,19 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     if (video?._id) {
       localStorage.setItem("lastPlayedVideoId", video._id);
     }
+
+    const resumeVideo = () => {
+      if (videoRef.current && videoRef.current.paused) {
+        videoRef.current.play().catch((err) => {
+          console.warn("Playback failed:", err);
+        });
+      }
+      document.removeEventListener("click", resumeVideo);
+    };
+
+    document.addEventListener("click", resumeVideo);
+
+    return () => document.removeEventListener("click", resumeVideo);
   }, [video]);
 
   useEffect(() => {
@@ -68,12 +79,15 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     if (!video?._id || from >= to) return;
 
     try {
-      const updated = await updateProgress({
-        videoId: video._id,
-        start: from,
-        end: to,
-        currentTime,
-      },source);
+      const updated = await updateProgress(
+        {
+          videoId: video._id,
+          start: from,
+          end: to,
+          currentTime,
+        },
+        source
+      );
 
       setVideos((prev) =>
         prev.map((v) => (v._id === updated._id ? updated : v))
@@ -85,32 +99,21 @@ const VideoPlayer = ({ videoId, setVideos }) => {
 
   // Pause
   const handlePause = () => {
+    isSeekingRef.current = true;
     const current = videoRef.current?.currentTime ?? 0;
-    setTimeout(() => {
-      if (videoRef.current.paused) {
-        console.log("paused triggered");
 
-        if (startTimeRef.current < current - 2) {
-          handleProgressUpdate(startTimeRef.current, current, current, "pause");
-        }
-        startTimeRef.current = current;
-      }
-    }, 1000);
-  };
-
-  // Ended
-  const handleEnded = () => {
-    const duration = videoRef.current?.duration ?? 0;
-    handleProgressUpdate(startTimeRef.current, duration, duration, "ended");
-    startTimeRef.current = 0;
+    if (startTimeRef.current < current - 2) {
+      handleProgressUpdate(startTimeRef.current, lastTrackedTimeRef.current, current, "pause");
+    }
+    startTimeRef.current = current;
+    isSeekingRef.current = false;
   };
 
   const handleSeeking = () => {
-     isSeekingRef.current = true;
+    isSeekingRef.current = true;
   };
 
   const handleSeeked = () => {
-    console.log("seeked triggerd");
     const seekedTo = videoRef.current?.currentTime ?? 0;
     if (
       lastTrackedTimeRef.current > startTimeRef.current &&
@@ -127,12 +130,16 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     isSeekingRef.current = false;
   };
 
-  const handleTimeUpdate = (e) => {
-    const current = e.target.currentTime;
-    if (!isSeekingRef.current) {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isSeekingRef.current) return;
+
+      const current = videoRef.current?.currentTime ?? 0;
       lastTrackedTimeRef.current = current;
-    }
-  };
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -177,10 +184,8 @@ const VideoPlayer = ({ videoId, setVideos }) => {
           poster={video.thumbnail}
           className="w-full h-full object-contain"
           onPause={handlePause}
-          onEnded={handleEnded}
           onSeeking={handleSeeking}
           onSeeked={handleSeeked}
-          onTimeUpdate={handleTimeUpdate}
         />
       </div>
       <h2 className="mt-4 text-xl font-semibold text-gray-800">

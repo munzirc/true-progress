@@ -1,3 +1,4 @@
+import Progress from "../models/progress.model.js";
 import Video from "../models/video.model.js";
 
 const addVideo = async (req, res) => {
@@ -106,11 +107,29 @@ const getVideoById = async (req, res) => {
     if (!video) {
       return res.status(404).json({ message: "Video not found" });
     }
-    res.json(video);
+
+    let progress = await Progress.findOne({
+      user: req.user._id,
+      video: video._id,
+    });
+
+    if (!progress) {
+      progress = await Progress.create({
+        user: req.user.id,
+        video: video._id,
+        intervals: [],
+        lastPosition: 0,
+      });
+    }
+
+    const{intervals, lastPosition, ...rest} = progress._doc;
+
+    res.json({ ...video.toObject(), progress : {intervals, lastPosition} });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
 
 export default {
   addVideo,

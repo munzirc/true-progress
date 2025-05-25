@@ -21,4 +21,25 @@ body {
   box-sizing: border-box;
 }
 
+/* Stylish scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  border-bottom-right-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e0f2fe; /* light blue */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b82f6; /* blue-500 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb; /* blue-600 */
+}
+
+
 

@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/add", protect, videoController.addVideo);
 router.delete("/:videoId", protect, videoController.removeVideo);
-router.get("", protect, videoController.getAllVideos);
+router.get("", protect, videoController.getVideosWithProgress);
+router.get("/:id", protect, videoController.getVideoById);
 
 export default router;

@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 
 import authRouter from "./routes/auth.route.js";
 import videoRouter from "./routes/video.route.js";
+import progressRouter from "./routes/progress.route.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 // routes
 app.use("/api/auth", authRouter);
 app.use("/api/video", videoRouter);
+app.use("/api/progress", progressRouter);
 
 app.get("/health", (req, res) => {
   res.send("health OK!");

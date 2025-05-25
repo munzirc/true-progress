@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApp } from "../../Context/AppContext";
+import { signin, signup } from "../api/auth.api";
+import { useApp } from "../Context/AppContext";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,8 +13,6 @@ const Login = () => {
   });
   const navigate = useNavigate();
   const { showSnackbar } = useApp();
-
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const toggleForm = () => setIsSignUp(!isSignUp);
 
@@ -28,22 +27,13 @@ const Login = () => {
     try {
       e.preventDefault();
       setLoading(true);
-      const endpoint = isSignUp
-        ? `${baseURL}/api/auth/signup`
-        : `${baseURL}/api/auth/signin`;
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
+      const res = isSignUp ? await signup(formData) : await signin(formData);
       const data = await res.json();
       showSnackbar(data.message, data.severity);
-      if (res.ok && !isSignUp) navigate("/lecturer-videos");
+      if (res.ok) navigate("/lecturer-videos");
     } catch (error) {
-        showSnackbar("Something went wrong!!", "error");
+      console.log(error);
+      showSnackbar("Something went wrong!!", "error");
     } finally {
       setLoading(false);
     }
@@ -86,8 +76,15 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            disabled={loading}
           >
-            {isSignUp ? "Register" : "Login"}
+            {isSignUp
+              ? loading
+                ? "Signing Up..."
+                : "Sign Up"
+              : loading
+              ? "Signing In..."
+              : "Sign In"}
           </button>
         </form>
 

@@ -1,6 +1,7 @@
-# 📺 TrueProgress – Intelligent Video Progress Tracker
+# 📺 TrueProgress – Real Progress Tracker
 
-**TrueProgress** is a smart video player system that tracks and persists how much of a video a user has uniquely watched. It ensures progress isn't inflated by re-watching or skipping, and always resumes from the last meaningful point — just like you'd expect in an e-learning platform or video lecture system.
+**TrueProgress** is a simple video player app that keeps track of how much of a video you've actually watched. It makes sure that if you skip around or rewatch parts, your progress is calculated accurately. The app also remembers where you left off, so you can pick up right where you stopped.
+
 
 ---
 

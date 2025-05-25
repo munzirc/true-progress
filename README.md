@@ -39,7 +39,7 @@
 ### 📥 Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/lecture-video-tracker.git
+git clone https://github.com/munzirc/\true-progress.git
 cd lecture-video-tracker
 ```
 

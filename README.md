@@ -1,6 +1,6 @@
-# 📺 Lecture Video Tracker
+# 📺 TrueProgress – Intelligent Video Progress Tracker
 
-A full-stack video player system that tracks user watch progress per video, calculates unique watched intervals, and resumes playback from the last watched point.
+**TrueProgress** is a smart video player system that tracks and persists how much of a video a user has uniquely watched. It ensures progress isn't inflated by re-watching or skipping, and always resumes from the last meaningful point — just like you'd expect in an e-learning platform or video lecture system.
 
 ---
 

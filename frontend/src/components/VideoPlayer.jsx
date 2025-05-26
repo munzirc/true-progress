@@ -23,7 +23,7 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   }, [videoId]);
 
   useEffect(() => {
-    if (video?.progress?.lastPosition && videoRef.current) {
+    if (video?.progress?.lastPosition && videoRef?.current) {
       videoRef.current.currentTime = video.progress.lastPosition;
       startTimeRef.current = video.progress.lastPosition;
     }
@@ -33,7 +33,7 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     }
 
     const resumeVideo = () => {
-      if (videoRef.current && videoRef.current.paused) {
+      if (videoRef?.current && videoRef?.current?.paused) {
         videoRef.current.play().catch((err) => {
           console.warn("Playback failed:", err);
         });
@@ -100,7 +100,7 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   // Pause
   const handlePause = () => {
     isSeekingRef.current = true;
-    const current = videoRef.current?.currentTime ?? 0;
+    const current = videoRef?.current?.currentTime ?? 0;
     if (startTimeRef.current < current - 2) {
       handleProgressUpdate(
         startTimeRef.current,
@@ -118,7 +118,7 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   };
 
   const handleSeeked = () => {
-    const seekedTo = videoRef.current?.currentTime ?? 0;
+    const seekedTo = videoRef?.current?.currentTime ?? 0;
     if (
       lastTrackedTimeRef.current > startTimeRef.current &&
       lastTrackedTimeRef.current - startTimeRef.current > 2
@@ -135,11 +135,11 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   };
 
   const handleTimeUpdate = (e) => {
-    if(videoRef.current?.paused) {
+    if(videoRef?.current?.paused) {
        isSeekingRef.current = true;
     }
     const current = e.target.currentTime;
-    if (!isSeekingRef.current && !videoRef.current?.paused) {
+    if (!isSeekingRef.current && !videoRef?.current?.paused) {
       lastTrackedTimeRef.current = current;
     }
   };

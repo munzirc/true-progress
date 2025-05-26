@@ -142,8 +142,6 @@ The backend stores intervals as [start, end] ranges. When a new interval is sent
 
 ---
 
----
-
 🔹 Challenges and solutions:
 Challenge: Detecting accurate end of watched intervals without spamming API calls.
 

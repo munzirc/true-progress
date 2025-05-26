@@ -101,9 +101,13 @@ const VideoPlayer = ({ videoId, setVideos }) => {
   const handlePause = () => {
     isSeekingRef.current = true;
     const current = videoRef.current?.currentTime ?? 0;
-
     if (startTimeRef.current < current - 2) {
-      handleProgressUpdate(startTimeRef.current, lastTrackedTimeRef.current, current, "pause");
+      handleProgressUpdate(
+        startTimeRef.current,
+        lastTrackedTimeRef.current,
+        current,
+        "pause"
+      );
     }
     startTimeRef.current = current;
     isSeekingRef.current = false;
@@ -130,16 +134,26 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     isSeekingRef.current = false;
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isSeekingRef.current) return;
-
-      const current = videoRef.current?.currentTime ?? 0;
+  const handleTimeUpdate = (e) => {
+    if(videoRef.current?.paused) {
+       isSeekingRef.current = true;
+    }
+    const current = e.target.currentTime;
+    if (!isSeekingRef.current && !videoRef.current?.paused) {
       lastTrackedTimeRef.current = current;
-    }, 500);
+    }
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (isSeekingRef.current) return;
+
+  //     const current = videoRef.current?.currentTime ?? 0;
+  //     lastTrackedTimeRef.current = current;
+  //   }, 500);
+
+  //   return () => clearInterval(interval);
+  // }, []);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -186,6 +200,7 @@ const VideoPlayer = ({ videoId, setVideos }) => {
           onPause={handlePause}
           onSeeking={handleSeeking}
           onSeeked={handleSeeked}
+          onTimeUpdate={handleTimeUpdate}
         />
       </div>
       <h2 className="mt-4 text-xl font-semibold text-gray-800">

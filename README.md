@@ -135,25 +135,26 @@ const mergeIntervals = (intervals) => {
 ## 📘 Design Documentation
 
 🔹 How watched intervals are tracked:
-Watched intervals are tracked by capturing the video’s playback using onTimeUpdate, which fires whenever the video’s currentTime  changes. When the user pauses, seeks, or ends the video, the current watched interval (start → end) is recorded, and the backend merges it with previously watched intervals.
+  - Watched intervals are tracked by capturing the video’s playback using onTimeUpdate, which fires whenever the video’s currentTime  changes. When the user pauses, seeks, or ends the video, the current watched interval (start → end) is recorded, and the backend merges it with previously watched intervals.
 
 🔹 How intervals are merged to calculate unique progress:
-The backend stores intervals as [start, end] ranges. When a new interval is sent, it merges it with any overlapping or adjacent intervals already stored, ensuring that repeated or skipped segments don’t inflate progress. The final progress is calculated as the total unique watched duration divided by the video’s total duration.
+  - The backend stores intervals as [start, end] ranges. When a new interval is sent, it merges it with any overlapping or adjacent intervals already stored, ensuring that repeated or skipped segments don’t inflate progress. The final progress is calculated as the total unique watched duration divided by the video’s total duration.
 
 ---
 
-🔹 Challenges and solutions:
-Challenge: Detecting accurate end of watched intervals without spamming API calls.
+## 🧪 Challenges and solutions:
 
-Solution: Instead of polling currentTime using setInterval, we used the native onTimeUpdate event, which is efficient and reliable for capturing real-time playback updates.
+🔹 Challenge: Detecting accurate end of watched intervals without spamming API calls.
 
-Challenge: Handling seek/skip accurately.
+   - Solution: Instead of polling currentTime using setInterval, we used the native onTimeUpdate event, which is efficient and reliable for capturing real-time playback updates.
 
-Solution: Used onSeeking and onSeeked events to finalize the previous interval before the seek and start a new one after seeking.
+🔹 Challenge: Handling seek/skip accurately.
 
-Challenge: First-time playback restricted by browser autoplay policies.
+   - Solution: Used onSeeking and onSeeked events to finalize the previous interval before the seek and start a new one after seeking.
 
-Solution: Delayed playback until the user interacts with the document via a click, using document.addEventListener("click", ...).
+🔹 Challenge: First-time playback restricted by browser autoplay policies.
+
+   - Solution: Delayed playback until the user interacts with the document via a click, using document.addEventListener("click", ...).
 
 ---
 

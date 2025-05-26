@@ -1,27 +1,27 @@
-# 📺 TrueProgress – Real Progress Tracker
 
-**TrueProgress** is a simple video player app that keeps track of how much of a video you've actually watched. It makes sure that if you skip around or rewatch parts, your progress is calculated accurately. The app also remembers where you left off, so you can pick up right where you stopped.
+# 📺 TrueProgress – Track What You *Actually* Watch
 
+**TrueProgress** is a smart video player app that accurately tracks how much of a video you've genuinely watched. Whether you skip around or rewatch sections, it avoids double-counting and saves your exact progress so you can resume right where you left off.
 
 ---
 
 ## 🚀 Features
 
-- 🎥 Watch lecture videos
-- 🔁 Automatically resume from last watched point
-- ✅ Track unique intervals watched
-- 🧠 Skip/rewatch detection: avoids double-counting
-- 📊 Accurate progress tracking on pause, seek, and exit
-- 💾 Auto-save progress before refresh/close (via `navigator.sendBeacon`)
+- 🎬 **Watch lecture videos**
+- 🔁 **Auto-resume** from your last watched point
+- ⏱️ **Tracks unique watch intervals** (no double-counting)
+- 🔄 **Skip & rewatch detection**
+- 📊 **Accurate progress calculation** on pause, seek, and close
+- 💾 **Auto-save progress** on page unload using `navigator.sendBeacon`
 
 ---
 
 ## 🗂️ Project Structure
 
 ```
-📦 root/
- ┣ 📁 frontend/         # Frontend (React + Tailwind + Vite)
- ┣ 📁 backend/         # Backend (Node.js + Express + MongoDB)
+📦 true-progress/
+ ┣ 📁 frontend/         # React + Tailwind + Vite (UI)
+ ┣ 📁 backend/          # Node.js + Express + MongoDB (API)
  ┗ 📄 README.md
 ```
 
@@ -29,9 +29,9 @@
 
 ## 🛠️ Getting Started
 
-### Prerequisites
+### ✅ Prerequisites
 
-- Node.js (v18+)
+- Node.js (v18 or later)
 - MongoDB
 
 ---
@@ -45,7 +45,7 @@ cd true-progress
 
 ---
 
-### 1️⃣ Backend Setup
+### ⚙️ Backend Setup
 
 ```bash
 cd backend
@@ -53,19 +53,19 @@ npm install
 npm run dev
 ```
 
-Set up a `.env` file with:
+Create a `.env` file in the `backend` folder:
 
 ```env
 PORT=5000
-MONGO_URI=your-mongo-connection
-ALLOWED_ORIGIN=http://localhost:5173 (your-frontend-url)
-NODE_ENV="development"
-JWT_SECRET=your-jwt-secret
+MONGO_URI=your-mongo-uri
+ALLOWED_ORIGIN=http://localhost:5173
+NODE_ENV=development
+JWT_SECRET=your-secret
 ```
 
 ---
 
-### 2️⃣ Frontend Setup
+### 💻 Frontend Setup
 
 ```bash
 cd frontend
@@ -73,7 +73,7 @@ npm install
 npm run dev
 ```
 
-Configure `.env` for frontend:
+Create a `.env` file in the `frontend` folder:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000
@@ -83,23 +83,16 @@ VITE_API_BASE_URL=http://localhost:5000
 
 ## ⚙️ How It Works
 
-### 📌 Tracking Watched Intervals
+### 🔍 Tracking Progress
 
-- A `Progress` model stores watched time ranges (e.g., `[10, 30]`, `[45, 50]`).
-- On every:
-
-  - `pause`
-  - `seek`
-  - `video end`
-  - `page close`
-
-  We send the interval from `startTime` → `currentTime`.
+- Every time you **pause**, **seek**, **finish** a video, or **close the tab**, the app records the interval you just watched.
+- These intervals are stored as `[start, end]` ranges.
 
 ---
 
-### 🧮 Merging Intervals
+### 🧠 Merging Intervals
 
-- The backend merges overlapping or adjacent intervals before storing:
+- To avoid double-counting, overlapping or adjacent intervals are merged before saving.
 
 ```ts
 const mergeIntervals = (intervals) => {
@@ -118,65 +111,62 @@ const mergeIntervals = (intervals) => {
 };
 ```
 
-- The total progress = sum of `(end - start)` from merged intervals.
-- The `lastPosition` is also updated to support resume functionality.
+- **Total progress** = sum of unique watched durations.
+- The **last watched position** is also saved to allow resuming playback.
 
 ---
 
-### 🔄 Events That Trigger Progress Updates
+### 🧩 Events That Trigger Progress Updates
 
-- `onPause`: saves watched segment
-- `onEnded`: marks video as complete
-- `onSeeking/onSeeked`: closes current interval and starts a new one
-- `beforeunload`: uses `sendBeacon` for a final update before page close
-
----
-
-## 📘 Design Documentation
-
-🔹 How watched intervals are tracked:
-  - Watched intervals are tracked by capturing the video’s playback using onTimeUpdate, which fires whenever the video’s currentTime  changes. When the user pauses, seeks, or ends the video, the current watched interval (start → end) is recorded, and the backend merges it with previously watched intervals.
-
-🔹 How intervals are merged to calculate unique progress:
-  - The backend stores intervals as [start, end] ranges. When a new interval is sent, it merges it with any overlapping or adjacent intervals already stored, ensuring that repeated or skipped segments don’t inflate progress. The final progress is calculated as the total unique watched duration divided by the video’s total duration.
+- `onPause`: Sends current interval
+- `onEnded`: Marks video as completed
+- `onSeeking/onSeeked`: Finalizes the previous interval and starts a new one
+- `beforeunload`: Uses `sendBeacon` to safely send data before closing
 
 ---
 
-## 🧪 Challenges and solutions:
+## 📘 Design Overview
 
-🔹 Challenge: Detecting accurate end of watched intervals without spamming API calls.
+🔹 **Interval Tracking**:  
+`onTimeUpdate` captures live playback. When the user pauses, seeks, or closes the video, the watched interval is stored.
 
-   - Solution: Instead of polling currentTime using setInterval, we used the native onTimeUpdate event, which is efficient and reliable for capturing real-time playback updates.
-
-🔹 Challenge: Handling seek/skip accurately.
-
-   - Solution: Used onSeeking and onSeeked events to finalize the previous interval before the seek and start a new one after seeking.
-
-🔹 Challenge: First-time playback restricted by browser autoplay policies.
-
-   - Solution: Delayed playback until the user interacts with the document via a click, using document.addEventListener("click", ...).
+🔹 **Progress Calculation**:  
+The backend merges overlapping intervals to calculate the *true* watched duration, ensuring repeated or skipped parts aren’t double-counted.
 
 ---
 
-## 📸 Demo
+## 🧪 Key Challenges & Solutions
 
-### 🔐 Login Page
-![Dashboard](/frontend/public/snapshot_1.png)
+🔸 **Avoiding excessive API calls**  
+✔️ Used `onTimeUpdate` instead of polling with `setInterval`.
 
-### 🎬 Video Player
+🔸 **Handling seek/skip accurately**  
+✔️ Captured `onSeeking` and `onSeeked` to finalize one interval and start the next.
+
+🔸 **Browser autoplay restrictions**  
+✔️ Delayed playback until the user interacts with the page using a `click` listener.
+
+---
+
+## 📸 Screenshots
+
+### 🔐 Login Page  
+![Login](/frontend/public/snapshot_1.png)
+
+### 🎥 Video Player  
 ![Video Player](/frontend/public/snapshot_2.png)
 
+---
+
+## 🧰 Tech Stack
+
+- **Frontend**: React, Tailwind CSS, Vite  
+- **Backend**: Node.js, Express  
+- **Database**: MongoDB
 
 ---
 
-## 📚 Tech Stack
+## 👨‍💻 Author
 
-- Frontend: React, Tailwind, Vite
-- Backend: Node.js, Express
-- Database: MongoDB
-
----
-
-## 🧠 Author
-
-**Mahammad Munzir**
+**Mahammad Munzir**  
+[GitHub – @munzirc](https://github.com/munzirc)

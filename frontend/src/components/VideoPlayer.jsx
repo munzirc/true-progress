@@ -144,17 +144,6 @@ const VideoPlayer = ({ videoId, setVideos }) => {
     }
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (isSeekingRef.current) return;
-
-  //     const current = videoRef.current?.currentTime ?? 0;
-  //     lastTrackedTimeRef.current = current;
-  //   }, 500);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
   useEffect(() => {
     const handleBeforeUnload = () => {
       const current = videoRef.current?.currentTime ?? 0;
